@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guestbook</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .input-group {
+            margin: 20px 0;
+        }
+        input[type="text"] {
+            width: 70%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .messages {
+            margin-top: 30px;
+        }
+        .message {
+            padding: 15px;
+            margin: 10px 0;
+            background: #f9f9f9;
+            border-left: 4px solid #4CAF50;
+            border-radius: 5px;
+        }
+        .timestamp {
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 GitOps Guestbook</h1>
+        <div class="input-group">
+            <input type="text" id="messageInput" placeholder="Leave a message...">
+            <button onclick="addMessage()">Send</button>
+        </div>
+        <div class="messages" id="messages"></div>
+    </div>
+
+    <script>
+        async function loadMessages() {
+            const response = await fetch('/api/messages');
+            const messages = await response.json();
+            displayMessages(messages);
+        }
+
+        async function addMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            await fetch('/api/messages', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text })
+            });
+
+            input.value = '';
+            loadMessages();
+        }
+
+        function displayMessages(messages) {
+            const container = document.getElementById('messages');
+            container.innerHTML = messages.map(msg => `
+                <div class="message">
+                    <div>${msg.text}</div>
+                    <div class="timestamp">${new Date(msg.timestamp).toLocaleString()}</div>
+                </div>
+            `).reverse().join('');
+        }
+
+        loadMessages();
+        setInterval(loadMessages, 5000);
+
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addMessage();
+        });
+    </script>
+</body>
+</html>
