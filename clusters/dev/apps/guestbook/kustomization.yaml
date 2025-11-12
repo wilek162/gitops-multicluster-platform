@@ -1,1 +1,1 @@
-# guestbook app (node or python) - base kustomization
+# /clusters/dev/apps/guestbook/kustomization.yaml - Kustomize configuration for dev guestbook
