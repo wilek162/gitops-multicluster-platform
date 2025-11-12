@@ -27,3 +27,4 @@ apps/guestbook/package-lock.json
 *.pem
 *.key
 secrets/
+bootstrap/*.kubeconfig
