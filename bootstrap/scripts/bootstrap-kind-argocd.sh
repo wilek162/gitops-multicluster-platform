@@ -53,6 +53,11 @@ echo "Installing ArgoCD..."
 kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
+# After applying the install.yaml
+kubectl patch deploy argocd-server -n argocd \
+  --type='json' \
+  -p='[{"op": "add", "path": "/spec/template/spec/containers/0/args/-", "value": "--enable-gzip"}]'   
+
 echo "Waiting for ArgoCD to be ready..."
 kubectl wait --for=condition=available --timeout=300s \
     deployment/argocd-server -n argocd
@@ -73,11 +78,11 @@ echo " ArgoCD Access Information"
 echo "==========================================="
 echo ""
 echo "🔐 ArgoCD Admin Password:"
-kubectl -n argocd get secret argocd-initial-admin-secret \
+KUBECONFIG="$KUBECONFIG_PATH" kubectl -n argocd get secret argocd-initial-admin-secret \
     -o jsonpath="{.data.password}" | base64 -d && echo
 echo ""
 echo "🌐 Access ArgoCD UI:"
-echo "   1. Run: kubectl port-forward svc/argocd-server -n argocd 8080:443"
+echo "   1. Run: KUBECONFIG=\"$KUBECONFIG_PATH\" kubectl port-forward svc/argocd-server -n argocd 8080:443"
 echo "   2. Open: https://localhost:8080"
 echo "   3. Login with username: admin"
 echo ""
