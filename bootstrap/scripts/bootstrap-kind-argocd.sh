@@ -1,1 +1,45 @@
-# /bootstrap/scripts/bootstrap-kind-argocd.sh - Bootstraps kind cluster + ArgoCD
+#!/usr/bin/env bash
+set -euo pipefail
+
+
+# Quick local bootstrap using kind and argocd (demo-friendly)
+CLUSTER_NAME=${1:-gitops-demo}
+KUBECONFIG=${KUBECONFIG:-$(pwd)/bootstrap/${CLUSTER_NAME}.kubeconfig}
+
+
+echo "Creating kind cluster $CLUSTER_NAME..."
+cat <<'EOF' | kind create cluster --name "$CLUSTER_NAME" --config=-
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+- role: worker
+EOF
+
+
+kubectl cluster-info --context kind-$CLUSTER_NAME
+
+
+# install ArgoCD
+echo "Installing ArgoCD into cluster $CLUSTER_NAME..."
+kubectl create namespace argocd || true
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+
+# Wait for ArgoCD server
+kubectl rollout status deployment/argocd-server -n argocd --timeout=120s
+
+
+# expose argocd server via port-forward in background for demos
+( kubectl port-forward svc/argocd-server -n argocd 8080:443 >/dev/null 2>&1 & )
+
+
+# store kubeconfig for repo usage
+kubectl config view --minify --flatten > "$KUBECONFIG"
+
+
+echo "ArgoCD installed. UI available at https://localhost:8080 (port-forward)."
+
+# print admin password
+echo "ArgoCD initial admin password:"
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo

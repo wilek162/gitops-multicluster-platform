@@ -1,1 +1,10 @@
-# /clusters/dev/apps/guestbook/patch-image.yaml - Image override for guestbook (dev)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guestbook
+spec:
+  template:
+    spec:
+      containers:
+      - name: guestbook
+        image: ghcr.io/PLACEHOLDER/guestbook:latest
