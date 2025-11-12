@@ -1,0 +1,29 @@
+# Kubeconfigs (never commit these!)
+*.kubeconfig
+bootstrap/*.kubeconfig
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node modules (for guestbook app)
+apps/guestbook/node_modules/
+apps/guestbook/package-lock.json
+
+# Secrets
+*.pem
+*.key
+secrets/
