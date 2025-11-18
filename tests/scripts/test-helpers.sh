@@ -62,6 +62,20 @@ assert_skip() {
     return 0
 }
 
+assert_warning() {
+    local message="$1"
+    log_warning "$message"
+    ((TESTS_RUN++))
+    return 0
+}
+
+assert_warning() {
+    local message="$1"
+    log_warning "$message"
+    ((TESTS_RUN++))
+    return 0
+}
+
 assert_equals() {
     local expected="$1"
     local actual="$2"

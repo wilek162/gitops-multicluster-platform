@@ -28,3 +28,6 @@ apps/guestbook/package-lock.json
 *.key
 secrets/
 bootstrap/*.kubeconfig
+
+
+gitops-multicluster-get-started/
